@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Access - Zay's Tech Hub</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Roboto', sans-serif; }
+        :root { --primary: #0066ff; --secondary: #00d4ff; --dark: #121826; --gray: #6c757d; --light: #f8f9fa; --success: #28a745; --error: #dc3545; --warning: #ffc107; }
+        body { background-color: var(--light); color: #333; line-height: 1.6; display: flex; flex-direction: column; min-height: 100vh; }
+        a { text-decoration: none; }
+        .container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+
+        /* Header Styles */
+        header { background-color: var(--dark); color: white; padding: 15px 0; position: sticky; top: 0; z-index: 1000; }
+        .header-container { display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-family: 'Orbitron', sans-serif; font-size: 28px; color: white; }
+        .logo span { color: var(--secondary); }
+        nav ul { display: flex; list-style: none; align-items: center; }
+        nav ul li { margin-left: 20px; }
+        nav ul li a { color: white; font-weight: 500; transition: color 0.3s; }
+        nav ul li a:hover, nav ul li a.active { color: var(--secondary); }
+        .signup-nav-btn { background-color: var(--primary); padding: 8px 16px; border-radius: 4px; color: white !important; }
+        .header-icons { display: flex; align-items: center; }
+        .header-icons button { color: white; background: none; border: none; margin-left: 20px; font-size: 20px; position: relative; cursor: pointer; }
+        .cart-count { position: absolute; top: -8px; right: -8px; background-color: var(--primary); color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 12px; display: flex; align-items: center; justify-content: center; }
+
+        /* Auth Section */
+        .auth-section { padding: 60px 0; flex: 1; display: flex; align-items: center; justify-content: center; }
+        .auth-card { background: white; width: 100%; max-width: 480px; padding: 40px; border-radius: 12px; box-shadow: 0 4px 25px rgba(0,0,0,0.08); }
+        .auth-header { text-align: center; margin-bottom: 30px; }
+        .auth-header h1 { font-family: 'Orbitron', sans-serif; font-size: 26px; color: var(--dark); margin-bottom: 8px; }
+        .auth-header p { color: var(--gray); font-size: 14px; }
+
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-weight: 500; margin-bottom: 6px; font-size: 14px; color: var(--dark); }
+        .form-control { width: 100%; padding: 12px 15px; border: 1px solid #ddd; border-radius: 6px; font-size: 15px; outline: none; transition: border-color 0.3s; }
+        .form-control:focus { border-color: var(--primary); }
+
+        .auth-btn { width: 100%; padding: 14px; background-color: var(--dark); color: white; border: none; border-radius: 6px; font-weight: 600; font-size: 16px; cursor: pointer; transition: background-color 0.3s; margin-top: 10px; }
+        .auth-btn:hover { background-color: var(--primary); }
+
+        .auth-switch { text-align: center; margin-top: 25px; font-size: 14px; color: var(--gray); }
+        .auth-switch a { color: var(--primary); font-weight: 600; cursor: pointer; text-decoration: underline; }
+        .auth-switch a:hover { color: var(--secondary); }
+
+        /* Cart Modal */
+        .cart-modal { display: none; position: fixed; top: 0; right: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 2000; justify-content: flex-end; }
+        .cart-modal.active { display: flex; }
+        .cart-content { width: 100%; max-width: 450px; background-color: white; height: 100%; padding: 30px; overflow-y: auto; display: flex; flex-direction: column; }
+        .cart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #eee; }
+        .close-cart { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--gray); }
+        .cart-items { flex: 1; overflow-y: auto; }
+        .cart-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .cart-total { display: flex; justify-content: space-between; font-size: 20px; font-weight: 700; margin: 20px 0; padding-top: 15px; border-top: 2px solid #eee; }
+        .checkout-btn { width: 100%; padding: 14px; background-color: var(--success); color: white; border: none; border-radius: 6px; font-weight: 600; font-size: 16px; cursor: pointer; }
+
+        /* Toast Notifications */
+        #toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; }
+        .toast { background: var(--dark); color: white; padding: 12px 24px; margin-top: 10px; border-radius: 4px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); border-left: 4px solid var(--secondary); animation: slideIn 0.3s ease, fadeOut 0.3s ease 2.7s forwards; }
+        .toast.error { border-left-color: var(--error); }
+        .toast.warning { border-left-color: var(--warning); }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes fadeOut { to { opacity: 0; transform: translateY(10px); } }
+
+        /* Footer */
+        footer { background-color: var(--dark); color: white; padding: 40px 0; text-align: center; }
+        .copyright { color: #aaa; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container header-container">
+            <a href="index.html" class="logo"><i class="fas fa-laptop-code"></i> Zay's <span>Tech Hub</span></a>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="categories.html">Categories</a></li>
+                    <li><a href="products.html">Products</a></li>
+                    <li><a href="brands.html">Brands</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                    <li><a href="signup.html" class="signup-nav-btn active">Account</a></li>
+                </ul>
+            </nav>
+            <div class="header-icons">
+                <button id="cartBtn"><i class="fas fa-shopping-cart"></i><span class="cart-count" id="cartCount">0</span></button>
+            </div>
+        </div>
+    </header>
+
+    <section class="auth-section">
+        <div class="container" style="display:flex; justify-content:center;">
+            <div class="auth-card">
+                <div class="auth-header" id="authHeader">
+                    <h1 id="authTitle">Create Account</h1>
+                    <p id="authSubtitle">Join Zay's Tech Hub for seamless gadget orders in Ghana</p>
+                </div>
+
+                <form id="authForm" onsubmit="handleAuth(event)">
+                    <div class="form-group" id="nameGroup">
+                        <label for="fullName">Full Name</label>
+                        <input type="text" id="fullName" class="form-control" placeholder="e.g. Kofi Mensah">
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" class="form-control" placeholder="name@example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" class="form-control" placeholder="••••••••" required>
+                    </div>
+
+                    <button type="submit" class="auth-btn" id="authSubmitBtn">Create Account</button>
+                </form>
+
+                <div class="auth-switch" id="authSwitchText">
+                    Already have an account? <a onclick="toggleAuthMode()">Log in here</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Cart Modal -->
+    <div class="cart-modal" id="cartModal">
+        <div class="cart-content">
+            <div class="cart-header">
+                <h2>Your Cart</h2>
+                <button class="close-cart" id="closeCartBtn"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="cart-items" id="cartItemsContainer"><p>Your cart is empty.</p></div>
+            <div class="cart-total"><span>Total:</span><span id="cartTotal">GH₵ 0.00</span></div>
+            <button class="checkout-btn" onclick="showToast('Proceeding to checkout secure gateway...')">Proceed to Checkout</button>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container"><div class="copyright"><p>&copy; 2026 Zay's Tech Hub. All rights reserved.</p></div></div>
+    </footer>
+
+    <!-- Firebase Integration -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+        import { 
+            getAuth, 
+            createUserWithEmailAndPassword, 
+            signInWithEmailAndPassword, 
+            sendEmailVerification, 
+            updateProfile 
+        } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
+
+        // Your Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDcu-4o9N0NTP7ZVhDoVbe-N04b1-ZIlV4",
+            authDomain: "zay-s-tech-hub.firebaseapp.com",
+            projectId: "zay-s-tech-hub",
+            storageBucket: "zay-s-tech-hub.firebasestorage.app",
+            messagingSenderId: "1026515120112",
+            appId: "1:1026515120112:web:545bc4dd1a2fd9fa867735"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        let isLoginMode = false;
+
+        window.toggleAuthMode = function() {
+            isLoginMode = !isLoginMode;
+            
+            const title = document.getElementById('authTitle');
+            const subtitle = document.getElementById('authSubtitle');
+            const nameGroup = document.getElementById('nameGroup');
+            const submitBtn = document.getElementById('authSubmitBtn');
+            const switchText = document.getElementById('authSwitchText');
+
+            document.getElementById('authForm').reset();
+
+            if (isLoginMode) {
+                title.textContent = "Welcome Back";
+                subtitle.textContent = "Log in with your verified email and password";
+                nameGroup.style.display = 'none';
+                document.getElementById('fullName').removeAttribute('required');
+                submitBtn.textContent = "Log In";
+                switchText.innerHTML = `Don't have an account? <a onclick="toggleAuthMode()">Sign up here</a>`;
+            } else {
+                title.textContent = "Create Account";
+                subtitle.textContent = "Join Zay's Tech Hub for seamless gadget orders in Ghana";
+                nameGroup.style.display = 'block';
+                document.getElementById('fullName').setAttribute('required', 'true');
+                submitBtn.textContent = "Create Account";
+                switchText.innerHTML = `Already have an account? <a onclick="toggleAuthMode()">Log in here</a>`;
+            }
+        }
+
+        window.handleAuth = async function(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+
+            try {
+                if (isLoginMode) {
+                    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                    const user = userCredential.user;
+
+                    // Enforce email verification
+                    if (!user.emailVerified) {
+                        showToast("Please check your email and click the verification link before logging in.", "warning");
+                        return;
+                    }
+
+                    showToast(`Welcome back, ${user.displayName || 'User'}! Login successful.`);
+                    setTimeout(() => { window.location.href = "index.html"; }, 1500);
+
+                } else {
+                    const fullName = document.getElementById('fullName').value.trim();
+                    
+                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                    const user = userCredential.user;
+
+                    await updateProfile(user, { displayName: fullName });
+                    await sendEmailVerification(user);
+
+                    showToast("Account created! A verification link has been sent to your email.", "warning");
+                    setTimeout(() => { 
+                        toggleAuthMode(); 
+                    }, 3500);
+                }
+            } catch (error) {
+                let errorMessage = error.message;
+                if (error.code === 'auth/email-already-in-use') {
+                    errorMessage = "This email is already registered. Please log in.";
+                } else if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found') {
+                    errorMessage = "Invalid email or password.";
+                } else if (error.code === 'auth/weak-password') {
+                    errorMessage = "Password should be at least 6 characters.";
+                }
+                showToast(errorMessage, "error");
+            }
+        }
+    </script>
+
+    <script>
+        // Shopping cart & UI helper logic
+        let cart = JSON.parse(localStorage.getItem('zays_cart')) || [];
+
+        function updateCartUI() {
+            const countEl = document.getElementById('cartCount');
+            const totalCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+            countEl.textContent = totalCount;
+
+            const container = document.getElementById('cartItemsContainer');
+            if (cart.length === 0) {
+                container.innerHTML = '<p>Your cart is empty.</p>';
+                document.getElementById('cartTotal').textContent = 'GH₵ 0.00';
+                return;
+            }
+
+            let total = 0;
+            container.innerHTML = cart.map(item => {
+                total += item.price * item.quantity;
+                return `
+                    <div class="cart-item">
+                        <div>
+                            <strong>${item.name}</strong><br>
+                            <small>GH₵ ${item.price.toLocaleString()} × ${item.quantity}</small>
+                        </div>
+                        <div style="color:var(--primary); font-weight:bold;">GH₵ ${(item.price * item.quantity).toLocaleString()}</div>
+                    </div>
+                `;
+            }).join('');
+            document.getElementById('cartTotal').textContent = `GH₵ ${total.toLocaleString()}`;
+        }
+
+        function showToast(message, type = 'success') {
+            let container = document.getElementById('toast-container');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'toast-container';
+                document.body.appendChild(container);
+            }
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 4000);
+        }
+
+        document.getElementById('cartBtn').addEventListener('click', () => document.getElementById('cartModal').classList.add('active'));
+        document.getElementById('closeCartBtn').addEventListener('click', () => document.getElementById('cartModal').classList.remove('active'));
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateCartUI();
+        });
+    </script>
+</body>
+</html>

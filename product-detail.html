@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details - Zay's Tech Hub</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Roboto', sans-serif; }
+        :root { --primary: #0066ff; --secondary: #00d4ff; --dark: #121826; --gray: #6c757d; --light: #f8f9fa; --success: #28a745; }
+        body { background-color: var(--light); color: #333; line-height: 1.6; display: flex; flex-direction: column; min-height: 100vh; }
+        a { text-decoration: none; }
+        .container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+
+        /* Header Styles */
+        header { background-color: var(--dark); color: white; padding: 15px 0; position: sticky; top: 0; z-index: 1000; }
+        .header-container { display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-family: 'Orbitron', sans-serif; font-size: 28px; color: white; }
+        .logo span { color: var(--secondary); }
+        nav ul { display: flex; list-style: none; align-items: center; }
+        nav ul li { margin-left: 20px; }
+        nav ul li a { color: white; font-weight: 500; transition: color 0.3s; }
+        nav ul li a:hover, nav ul li a.active { color: var(--secondary); }
+        .signup-nav-btn { background-color: var(--primary); padding: 8px 16px; border-radius: 4px; color: white !important; }
+        .header-icons { display: flex; align-items: center; }
+        .header-icons button { color: white; background: none; border: none; margin-left: 20px; font-size: 20px; position: relative; cursor: pointer; }
+        .cart-count { position: absolute; top: -8px; right: -8px; background-color: var(--primary); color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 12px; display: flex; align-items: center; justify-content: center; }
+
+        /* Detail Section */
+        .detail-section { padding: 60px 0; flex: 1; }
+        .back-link { display: inline-block; margin-bottom: 25px; color: var(--primary); font-weight: 500; }
+        .back-link i { margin-right: 5px; }
+        .product-detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+        .product-image-box { border-radius: 8px; overflow: hidden; background-color: #f1f3f5; height: 400px; display: flex; align-items: center; justify-content: center; position: relative; }
+        .product-image-box img { width: 100%; height: 100%; object-fit: cover; }
+        .detail-badge { position: absolute; top: 15px; left: 15px; background-color: var(--primary); color: white; padding: 6px 12px; font-size: 12px; font-weight: 600; border-radius: 4px; text-transform: uppercase; }
+        
+        .product-info-box h1 { font-family: 'Orbitron', sans-serif; font-size: 28px; color: var(--dark); margin-bottom: 15px; }
+        .product-meta { font-size: 14px; color: var(--gray); text-transform: uppercase; margin-bottom: 15px; font-weight: 500; }
+        .product-price-tag { font-size: 28px; font-weight: 700; color: var(--primary); margin-bottom: 20px; }
+        .product-desc { color: #555; margin-bottom: 25px; font-size: 16px; line-height: 1.8; }
+        
+        .specs-list { margin-bottom: 30px; list-style: none; border-top: 1px solid #eee; border-bottom: 1px solid #eee; padding: 15px 0; }
+        .specs-list li { padding: 6px 0; display: flex; font-size: 14px; color: #444; }
+        .specs-list li strong { width: 140px; color: var(--dark); }
+
+        .action-group { display: flex; gap: 15px; align-items: center; }
+        .quantity-selector { display: flex; align-items: center; border: 1px solid #ddd; border-radius: 6px; overflow: hidden; }
+        .qty-btn { background: #f1f3f5; border: none; padding: 12px 16px; cursor: pointer; font-size: 16px; font-weight: bold; }
+        .qty-input { width: 50px; text-align: center; border: none; font-size: 16px; outline: none; }
+        .add-to-cart-lg { flex: 1; padding: 14px; background-color: var(--dark); color: white; border: none; border-radius: 6px; font-weight: 600; font-size: 16px; cursor: pointer; transition: background-color 0.3s; }
+        .add-to-cart-lg:hover { background-color: var(--primary); }
+
+        /* Cart Modal */
+        .cart-modal { display: none; position: fixed; top: 0; right: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 2000; justify-content: flex-end; }
+        .cart-modal.active { display: flex; }
+        .cart-content { width: 100%; max-width: 450px; background-color: white; height: 100%; padding: 30px; overflow-y: auto; display: flex; flex-direction: column; }
+        .cart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #eee; }
+        .close-cart { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--gray); }
+        .cart-items { flex: 1; overflow-y: auto; }
+        .cart-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .cart-total { display: flex; justify-content: space-between; font-size: 20px; font-weight: 700; margin: 20px 0; padding-top: 15px; border-top: 2px solid #eee; }
+        .checkout-btn { width: 100%; padding: 14px; background-color: var(--success); color: white; border: none; border-radius: 6px; font-weight: 600; font-size: 16px; cursor: pointer; }
+
+        /* Toast */
+        #toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; }
+        .toast { background: var(--dark); color: white; padding: 12px 24px; margin-top: 10px; border-radius: 4px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); border-left: 4px solid var(--secondary); animation: slideIn 0.3s ease, fadeOut 0.3s ease 2.7s forwards; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes fadeOut { to { opacity: 0; transform: translateY(10px); } }
+
+        /* Footer */
+        footer { background-color: var(--dark); color: white; padding: 40px 0; text-align: center; }
+        .copyright { color: #aaa; font-size: 14px; }
+
+        @media(max-width: 768px) {
+            .product-detail-grid { grid-template-columns: 1fr; padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container header-container">
+            <a href="index.html" class="logo"><i class="fas fa-laptop-code"></i> Zay's <span>Tech Hub</span></a>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="categories.html">Categories</a></li>
+                    <li><a href="products.html" class="active">Products</a></li>
+                    <li><a href="brands.html">Brands</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                    <li><a href="signup.html" class="signup-nav-btn">Sign Up</a></li>
+                </ul>
+            </nav>
+            <div class="header-icons">
+                <button id="cartBtn"><i class="fas fa-shopping-cart"></i><span class="cart-count" id="cartCount">0</span></button>
+            </div>
+        </div>
+    </header>
+
+    <div class="detail-section">
+        <div class="container">
+            <a href="products.html" class="back-link"><i class="fas fa-arrow-left"></i> Back to Catalog</a>
+            <div id="productDetailContainer">
+                <!-- Dynamically loaded based on URL query parameter ?id=X -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Cart Modal -->
+    <div class="cart-modal" id="cartModal">
+        <div class="cart-content">
+            <div class="cart-header">
+                <h2>Your Cart</h2>
+                <button class="close-cart" id="closeCartBtn"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="cart-items" id="cartItemsContainer"><p>Your cart is empty.</p></div>
+            <div class="cart-total"><span>Total:</span><span id="cartTotal">GH₵ 0.00</span></div>
+            <button class="checkout-btn" onclick="showToast('Proceeding to checkout secure gateway...')">Proceed to Checkout</button>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container"><div class="copyright"><p>&copy; 2026 Zay's Tech Hub. All rights reserved.</p></div></div>
+    </footer>
+
+    <script>
+        // Master product list with detailed specs and descriptions
+        const products = [
+            { 
+                id: 1, name: "Apple iPhone 11 (Refurbished/Clean)", category: "smartphone", brand: "apple", price: 3800, 
+                image: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=800&q=80", badge: "Best Seller",
+                desc: "A reliable and powerful entry into iOS. Professionally inspected, clean condition with robust battery health. Perfect for daily communication, photography, and smooth performance.",
+                specs: { "Storage": "64GB / 128GB options", "Display": "6.1-inch Liquid Retina LCD", "Camera": "Dual 12MP Ultra Wide & Wide", "Processor": "A13 Bionic chip", "Condition": "Certified Clean Refurbished" }
+            },
+            { 
+                id: 2, name: "Apple iPhone 12 (64GB)", category: "smartphone", brand: "apple", price: 5500, 
+                image: "https://images.unsplash.com/photo-1605236453806-6ff36851218e?auto=format&fit=crop&w=800&q=80", badge: "Popular",
+                desc: "Equipped with 5G speed, an OLED Super Retina XDR display, and Ceramic Shield front cover for increased drop durability. Exceptional camera quality in low-light environments.",
+                specs: { "Storage": "64GB", "Display": "6.1-inch Super Retina XDR", "Connectivity": "5G LTE Enabled", "Processor": "A14 Bionic chip", "Build": "Ceramic Shield front" }
+            },
+            { 
+                id: 3, name: "Apple iPhone 13 (128GB)", category: "smartphone", brand: "apple", price: 7800, 
+                image: "https://images.unsplash.com/photo-1591337676887-a217a6970a8a?auto=format&fit=crop&w=800&q=80", badge: "Top Tier",
+                desc: "Features a massive leap in battery life, Cinematic mode for video recording with shallow depth of field, and the lightning-fast A15 Bionic processor.",
+                specs: { "Storage": "128GB", "Display": "6.1-inch OLED Display", "Battery": "Up to 19 hours video playback", "Processor": "A15 Bionic", "Water Resistance": "IP68 rated" }
+            },
+            { 
+                id: 4, name: "Samsung Galaxy A15 (LTE/128GB)", category: "smartphone", brand: "samsung", price: 2100, 
+                image: "https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?auto=format&fit=crop&w=800&q=80", badge: "Budget Value",
+                desc: "An incredible value smartphone tailored for daily budget efficiency in Ghana. Bright Super AMOLED display, dependable octa-core processor, and all-day battery life.",
+                specs: { "Storage": "128GB (Expandable up to 1TB)", "Display": "6.5-inch Super AMOLED (90Hz)", "Camera": "50MP Triple Camera", "Battery": "5000 mAh with Fast Charging", "SIM": "Dual Nano-SIM" }
+            },
+            { 
+                id: 5, name: "Samsung Galaxy A35 5G", category: "smartphone", brand: "samsung", price: 3600, 
+                image: "https://images.unsplash.com/photo-1580910051074-3eb694886505?auto=format&fit=crop&w=800&q=80", badge: "New Arrival",
+                desc: "Sleek glass back design combined with advanced nightography camera features and robust Knox security protection. Built for seamless multitasking.",
+                specs: { "Storage": "128GB / 6GB RAM", "Display": "6.6-inch FHD+ Super AMOLED", "Processor": "Exynos 1380", "Security": "Samsung Knox Vault", "Dust/Water": "IP67 Water Resistant" }
+            },
+            { 
+                id: 6, name: "Samsung Galaxy S21 FE 5G", category: "smartphone", brand: "samsung", price: 4900, 
+                image: "https://images.unsplash.com/photo-1546054454-aa26e2b734c7?auto=format&fit=crop&w=800&q=80", badge: "Flagship Deal",
+                desc: "Fan Edition flagship performance packed with a pro-grade camera, 120Hz smooth scrolling display, and premium processor muscle without the high flagship price tag.",
+                specs: { "Storage": "128GB / 8GB RAM", "Display": "6.4-inch Dynamic AMOLED 2X", "Refresh Rate": "120Hz", "Processor": "Snapdragon 888 / Exynos 2100", "OS": "Upgradable Android" }
+            },
+            { 
+                id: 7, name: "HP ProBook 645 G4 (Ryzen 5 / 8GB RAM)", category: "laptop", brand: "hp", price: 3200, 
+                image: "https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=800&q=80", badge: "Office Choice",
+                desc: "A sturdy, business-class laptop driven by AMD Ryzen power. Excellent keyboard ergonomics, durable chassis, and solid connectivity ports for professionals and remote workers.",
+                specs: { "Processor": "AMD Ryzen 5 PRO", "Memory": "8GB DDR4 RAM", "Storage": "256GB NVMe SSD", "Display": "14-inch Anti-Glare FHD", "OS": "Windows 11 Pro" }
+            },
+            { 
+                id: 8, name: "HP EliteBook 840 G6 (Core i5 8th Gen)", category: "laptop", brand: "hp", price: 4200, 
+                image: "https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?auto=format&fit=crop&w=800&q=80", badge: "Reliable",
+                desc: "Premium aluminum build with enterprise-grade security features. Perfect balance of portability, executive styling, and fast daily processing speed.",
+                specs: { "Processor": "Intel Core i5-8265U (8th Gen)", "Memory": "8GB RAM / 16GB Config", "Storage": "256GB High-Speed SSD", "Display": "14-inch IPS Display", "Build": "Precision Crafted Aluminum" }
+            },
+            { 
+                id: 9, name: "HP Pavilion x360 Convertible", category: "laptop", brand: "hp", price: 5400, 
+                image: "https://images.unsplash.com/photo-1593642632823-8f785ba67e45?auto=format&fit=crop&w=800&q=80", badge: "Touchscreen",
+                desc: "Flex your creativity with a 360-degree hinge. Use it as a laptop, stand it up for movies, fold it into a tent, or take notes in tablet mode with touch capability.",
+                specs: { "Design": "360° Convertible Hinge", "Display": "15.6-inch Touchscreen HD/FHD", "Processor": "Intel Core i5 / i3 variants", "Audio": "B&O Dual Speakers", "Convenience": "Backlit Keyboard" }
+            },
+            { 
+                id: 10, name: "Dell Latitude 5490 (Core i5 / 256GB SSD)", category: "laptop", brand: "dell", price: 3400, 
+                image: "https://images.unsplash.com/photo-1583863788434-e58a36330cf0?auto=format&fit=crop&w=800&q=80", badge: "Student Pick",
+                desc: "The ultimate dependable workstation for university students and remote office staff in Ghana. Fast boot times, rugged casing, and comfortable typing experience.",
+                specs: { "Processor": "Intel Core i5 (8th Gen)", "Memory": "8GB RAM", "Storage": "256GB Solid State Drive", "Connectivity": "USB-C, HDMI, RJ45 Ethernet", "Battery": "Long-life dependable cell" }
+            },
+            { 
+                id: 11, name: "Dell Latitude 7400 (Core i7 / 16GB RAM)", category: "laptop", brand: "dell", price: 4800, 
+                image: "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?auto=format&fit=crop&w=800&q=80", badge: "High Performance",
+                desc: "High-end corporate performance machine. Powered by an Intel Core i7 processor and generous 16GB RAM to effortlessly handle heavy databases, programming, and multitasking.",
+                specs: { "Processor": "Intel Core i7", "Memory": "16GB RAM", "Storage": "512GB NVMe SSD", "Chassis": "Carbon Fiber reinforced polymer", "Weight": "Ultra-lightweight (~1.36 kg)" }
+            },
+            { 
+                id: 12, name: "ASUS VivoBook 15 (Intel Core i3 / 8GB)", category: "laptop", brand: "asus", price: 3900, 
+                image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=800&q=80", badge: "Sleek Design",
+                desc: "Featuring a near-bezel-less NanoEdge display for an immersive viewing experience. Sleek, stylish silver finish designed to look sharp in classrooms and boardrooms.",
+                specs: { "Processor": "Intel Core i3", "Memory": "8GB RAM", "Storage": "256GB SSD", "Display": "15.6-inch NanoEdge FHD", "Keyboard": "Ergonomic full-size with numeric pad" }
+            },
+            { 
+                id: 13, name: "ASUS TUF Gaming A15 (GTX 1650)", category: "laptop", brand: "asus", price: 7900, 
+                image: "https://images.unsplash.com/photo-1603302576837-37561b2e2302?auto=format&fit=crop&w=800&q=80", badge: "Gaming",
+                desc: "Military-grade gaming durability paired with dedicated NVIDIA graphics. Perfect for gamers, video editors, and 3D rendering tasks demanding high GPU performance.",
+                specs: { "Graphics": "NVIDIA GeForce GTX 1650", "Processor": "AMD Ryzen 5 / 7", "Display": "144Hz Gaming Panel", "Cooling": "Self-cleaning dual fans", "Durability": "MIL-STD-810H military standard" }
+            }
+        ];
+
+        let cart = JSON.parse(localStorage.getItem('zays_cart')) || [];
+
+        function getQueryParams() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('id');
+        }
+
+        function renderProductDetail() {
+            const productId = parseInt(getQueryParams()) || 1;
+            const product = products.find(p => p.id === productId) || products[0];
+
+            const container = document.getElementById('productDetailContainer');
+            
+            let specsHTML = '';
+            for (const [key, val] of Object.entries(product.specs)) {
+                specsHTML += `<li><strong>${key}:</strong> <span>${val}</span></li>`;
+            }
+
+            container.innerHTML = `
+                <div class="product-detail-grid">
+                    <div class="product-image-box">
+                        <span class="detail-badge">${product.badge}</span>
+                        <img src="${product.image}" alt="${product.name}">
+                    </div>
+                    <div class="product-info-box">
+                        <div class="product-meta">${product.brand.toUpperCase()} - ${product.category.toUpperCase()}</div>
+                        <h1>${product.name}</h1>
+                        <div class="product-price-tag">GH₵ ${product.price.toLocaleString()}</div>
+                        <p class="product-desc">${product.desc}</p>
+                        
+                        <ul class="specs-list">
+                            ${specsHTML}
+                        </ul>
+
+                        <div class="action-group">
+                            <div class="quantity-selector">
+                                <button class="qty-btn" onclick="adjustQty(-1)">-</button>
+                                <input type="text" id="qtyInput" class="qty-input" value="1" readonly>
+                                <button class="qty-btn" onclick="adjustQty(1)">+</button>
+                            </div>
+                            <button class="add-to-cart-lg" onclick="addCurrentToCart(${product.id})"><i class="fas fa-shopping-cart"></i> Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function adjustQty(change) {
+            const input = document.getElementById('qtyInput');
+            let val = parseInt(input.value) + change;
+            if (val < 1) val = 1;
+            input.value = val;
+        }
+
+        function addCurrentToCart(productId) {
+            const product = products.find(p => p.id === productId);
+            const qty = parseInt(document.getElementById('qtyInput').value) || 1;
+            const existingItem = cart.find(item => item.id === productId);
+
+            if (existingItem) {
+                existingItem.quantity += qty;
+            } else {
+                cart.push({ ...product, quantity: qty });
+            }
+
+            localStorage.setItem('zays_cart', JSON.stringify(cart));
+            updateCartUI();
+            showToast(`${qty} × ${product.name} added to cart!`);
+        }
+
+        function updateCartUI() {
+            const countEl = document.getElementById('cartCount');
+            const totalCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+            countEl.textContent = totalCount;
+
+            const container = document.getElementById('cartItemsContainer');
+            if (cart.length === 0) {
+                container.innerHTML = '<p>Your cart is empty.</p>';
+                document.getElementById('cartTotal').textContent = 'GH₵ 0.00';
+                return;
+            }
+
+            let total = 0;
+            container.innerHTML = cart.map(item => {
+                total += item.price * item.quantity;
+                return `
+                    <div class="cart-item">
+                        <div>
+                            <strong>${item.name}</strong><br>
+                            <small>GH₵ ${item.price.toLocaleString()} × ${item.quantity}</small>
+                        </div>
+                        <div style="color:var(--primary); font-weight:bold;">GH₵ ${(item.price * item.quantity).toLocaleString()}</div>
+                    </div>
+                `;
+            }).join('');
+            document.getElementById('cartTotal').textContent = `GH₵ ${total.toLocaleString()}`;
+        }
+
+        function showToast(message) {
+            let container = document.getElementById('toast-container');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'toast-container';
+                document.body.appendChild(container);
+            }
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        document.getElementById('cartBtn').addEventListener('click', () => document.getElementById('cartModal').classList.add('active'));
+        document.getElementById('closeCartBtn').addEventListener('click', () => document.getElementById('cartModal').classList.remove('active'));
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderProductDetail();
+            updateCartUI();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zay's Tech Hub - Affordable Tech in Ghana</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Roboto', sans-serif; }
+        :root { --primary: #0066ff; --secondary: #00d4ff; --dark: #121826; --gray: #6c757d; --light: #f8f9fa; --success: #28a745; }
+        body { background-color: var(--light); color: #333; line-height: 1.6; display: flex; flex-direction: column; min-height: 100vh; }
+        a { text-decoration: none; }
+        .container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+
+        /* Header Styles */
+        header { background-color: var(--dark); color: white; padding: 15px 0; position: sticky; top: 0; z-index: 1000; }
+        .header-container { display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-family: 'Orbitron', sans-serif; font-size: 28px; color: white; }
+        .logo span { color: var(--secondary); }
+        nav ul { display: flex; list-style: none; align-items: center; }
+        nav ul li { margin-left: 20px; }
+        nav ul li a { color: white; font-weight: 500; transition: color 0.3s; }
+        nav ul li a:hover, nav ul li a.active { color: var(--secondary); }
+        .signup-nav-btn { background-color: var(--primary); padding: 8px 16px; border-radius: 4px; color: white !important; }
+        .header-icons { display: flex; align-items: center; }
+        .header-icons button { color: white; background: none; border: none; margin-left: 20px; font-size: 20px; position: relative; cursor: pointer; }
+        .cart-count { position: absolute; top: -8px; right: -8px; background-color: var(--primary); color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 12px; display: flex; align-items: center; justify-content: center; }
+
+        /* Hero Section */
+        .hero { background: linear-gradient(135deg, var(--dark), #1f293d); color: white; padding: 80px 0; text-align: center; }
+        .hero h1 { font-family: 'Orbitron', sans-serif; font-size: 42px; margin-bottom: 20px; }
+        .hero h1 span { color: var(--secondary); }
+        .hero p { font-size: 18px; color: #ccc; max-width: 700px; margin: 0 auto 30px; }
+        .hero-btn { display: inline-block; background: linear-gradient(to right, var(--primary), var(--secondary)); color: white; padding: 12px 30px; border-radius: 6px; font-weight: 600; font-size: 16px; transition: opacity 0.3s; }
+        .hero-btn:hover { opacity: 0.9; }
+
+        /* Featured Section */
+        .section-title { font-family: 'Orbitron', sans-serif; font-size: 28px; color: var(--dark); text-align: center; margin: 50px 0 30px; }
+        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 25px; margin-bottom: 60px; }
+        .product-card { background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: transform 0.3s, box-shadow 0.3s; display: flex; flex-direction: column; }
+        .product-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .product-img-container { height: 200px; background-color: #f1f3f5; display: flex; align-items: center; justify-content: center; position: relative; }
+        .product-img-container i { font-size: 64px; color: var(--gray); }
+        .product-badge { position: absolute; top: 10px; left: 10px; background-color: var(--primary); color: white; padding: 4px 8px; font-size: 11px; font-weight: 600; border-radius: 4px; text-transform: uppercase; }
+        .product-info { padding: 20px; display: flex; flex-direction: column; flex: 1; }
+        .product-category { font-size: 12px; color: var(--gray); text-transform: uppercase; margin-bottom: 5px; font-weight: 500; }
+        .product-title { font-size: 16px; font-weight: 600; color: var(--dark); margin-bottom: 10px; line-height: 1.4; }
+        .product-price { font-size: 18px; font-weight: 700; color: var(--primary); margin-bottom: 15px; margin-top: auto; }
+        .add-to-cart-btn { width: 100%; padding: 10px; background-color: var(--dark); color: white; border: none; border-radius: 6px; font-weight: 500; cursor: pointer; transition: background-color 0.3s; }
+        .add-to-cart-btn:hover { background-color: var(--primary); }
+
+        /* Cart Modal */
+        .cart-modal { display: none; position: fixed; top: 0; right: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 2000; justify-content: flex-end; }
+        .cart-modal.active { display: flex; }
+        .cart-content { width: 100%; max-width: 450px; background-color: white; height: 100%; padding: 30px; overflow-y: auto; display: flex; flex-direction: column; }
+        .cart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #eee; }
+        .close-cart { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--gray); }
+        .cart-items { flex: 1; overflow-y: auto; }
+        .cart-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .cart-total { display: flex; justify-content: space-between; font-size: 20px; font-weight: 700; margin: 20px 0; padding-top: 15px; border-top: 2px solid #eee; }
+        .checkout-btn { width: 100%; padding: 14px; background-color: var(--success); color: white; border: none; border-radius: 6px; font-weight: 600; font-size: 16px; cursor: pointer; }
+
+        /* Toast notifications */
+        #toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; }
+        .toast { background: var(--dark); color: white; padding: 12px 24px; margin-top: 10px; border-radius: 4px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); border-left: 4px solid var(--secondary); animation: slideIn 0.3s ease, fadeOut 0.3s ease 2.7s forwards; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes fadeOut { to { opacity: 0; transform: translateY(10px); } }
+
+        /* Footer */
+        footer { background-color: var(--dark); color: white; padding: 40px 0; text-align: center; margin-top: auto; }
+        .copyright { color: #aaa; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container header-container">
+            <a href="index.html" class="logo"><i class="fas fa-laptop-code"></i> Zay's <span>Tech Hub</span></a>
+            <nav>
+                <ul>
+                    <li><a href="index.html" class="active">Home</a></li>
+                    <li><a href="categories.html">Categories</a></li>
+                    <li><a href="products.html">Products</a></li>
+                    <li><a href="brands.html">Brands</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                    <li><a href="signup.html" class="signup-nav-btn">Sign Up</a></li>
+                </ul>
+            </nav>
+            <div class="header-icons">
+                <button id="cartBtn"><i class="fas fa-shopping-cart"></i><span class="cart-count" id="cartCount">0</span></button>
+            </div>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <h1>Quality Tech, <span>Accessible to All</span></h1>
+            <p>Shop top-tier affordable iPhones, Samsung Galaxy phones, HP, Dell, and ASUS laptops tailored to match the Ghanaian standard of living.</p>
+            <a href="products.html" class="hero-btn">Explore Full Catalog</a>
+        </div>
+    </section>
+
+    <div class="container">
+        <h2 class="section-title">Featured Devices</h2>
+        <div class="products-grid" id="featuredGrid">
+            <!-- Dynamically populated top picks -->
+        </div>
+    </div>
+
+    <!-- Cart Modal -->
+    <div class="cart-modal" id="cartModal">
+        <div class="cart-content">
+            <div class="cart-header">
+                <h2>Your Cart</h2>
+                <button class="close-cart" id="closeCartBtn"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="cart-items" id="cartItemsContainer"><p>Your cart is empty.</p></div>
+            <div class="cart-total"><span>Total:</span><span id="cartTotal">GH₵ 0.00</span></div>
+            <button class="checkout-btn" onclick="showToast('Proceeding to checkout secure gateway...')">Proceed to Checkout</button>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container"><div class="copyright"><p>&copy; 2026 Zay's Tech Hub. All rights reserved.</p></div></div>
+    </footer>
+
+    <script>
+        const featuredProducts = [
+            { id: 1, name: "Apple iPhone 11 (Refurbished/Clean)", category: "smartphone", brand: "apple", price: 3800, icon: "fa-mobile-screen", badge: "Best Seller" },
+            { id: 3, name: "Apple iPhone 13 (128GB)", category: "smartphone", brand: "apple", price: 7800, icon: "fa-mobile-screen", badge: "Top Tier" },
+            { id: 4, name: "Samsung Galaxy A15 (LTE/128GB)", category: "smartphone", brand: "samsung", price: 2100, icon: "fa-mobile-screen", badge: "Budget Value" },
+            { id: 8, name: "HP EliteBook 840 G6 (Core i5 8th Gen)", category: "laptop", brand: "hp", price: 4200, icon: "fa-laptop", badge: "Reliable" },
+            { id: 10, name: "Dell Latitude 5490 (Core i5 / 256GB SSD)", category: "laptop", brand: "dell", price: 3400, icon: "fa-laptop", badge: "Student Pick" },
+            { id: 12, name: "ASUS VivoBook 15 (Intel Core i3 / 8GB)", category: "laptop", brand: "asus", price: 3900, icon: "fa-laptop", badge: "Sleek Design" }
+        ];
+
+        let cart = JSON.parse(localStorage.getItem('zays_cart')) || [];
+
+        function renderFeatured() {
+            const grid = document.getElementById('featuredGrid');
+            grid.innerHTML = featuredProducts.map(p => `
+                <div class="product-card">
+                    <div class="product-img-container">
+                        <span class="product-badge">${p.badge}</span>
+                        <i class="fas ${p.icon}"></i>
+                    </div>
+                    <div class="product-info">
+                        <span class="product-category">${p.brand.toUpperCase()} - ${p.category}</span>
+                        <h3 class="product-title">${p.name}</h3>
+                        <div class="product-price">GH₵ ${p.price.toLocaleString()}</div>
+                        <button class="add-to-cart-btn" onclick="addToCart(${p.id})">Add to Cart</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function addToCart(productId) {
+            const product = featuredProducts.find(p => p.id === productId);
+            const existingItem = cart.find(item => item.id === productId);
+
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({ ...product, quantity: 1 });
+            }
+
+            localStorage.setItem('zays_cart', JSON.stringify(cart));
+            updateCartUI();
+            showToast(`${product.name} added to cart!`);
+        }
+
+        function updateCartUI() {
+            const countEl = document.getElementById('cartCount');
+            const totalCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+            countEl.textContent = totalCount;
+
+            const container = document.getElementById('cartItemsContainer');
+            if (cart.length === 0) {
+                container.innerHTML = '<p>Your cart is empty.</p>';
+                document.getElementById('cartTotal').textContent = 'GH₵ 0.00';
+                return;
+            }
+
+            let total = 0;
+            container.innerHTML = cart.map(item => {
+                total += item.price * item.quantity;
+                return `
+                    <div class="cart-item">
+                        <div>
+                            <strong>${item.name}</strong><br>
+                            <small>GH₵ ${item.price.toLocaleString()} × ${item.quantity}</small>
+                        </div>
+                        <div style="color:var(--primary); font-weight:bold;">GH₵ ${(item.price * item.quantity).toLocaleString()}</div>
+                    </div>
+                `;
+            }).join('');
+            document.getElementById('cartTotal').textContent = `GH₵ ${total.toLocaleString()}`;
+        }
+
+        function showToast(message) {
+            let container = document.getElementById('toast-container');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'toast-container';
+                document.body.appendChild(container);
+            }
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        document.getElementById('cartBtn').addEventListener('click', () => document.getElementById('cartModal').classList.add('active'));
+        document.getElementById('closeCartBtn').addEventListener('click', () => document.getElementById('cartModal').classList.remove('active'));
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderFeatured();
+            updateCartUI();
+        });
+    </script>
+</body>
+</html>

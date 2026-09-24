@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brands Showcase - Zay's Tech Hub</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Roboto', sans-serif; }
+        :root { --primary: #0066ff; --secondary: #00d4ff; --dark: #121826; --gray: #6c757d; --light: #f8f9fa; --success: #28a745; }
+        body { background-color: var(--light); color: #333; line-height: 1.6; display: flex; flex-direction: column; min-height: 100vh; }
+        a { text-decoration: none; }
+        .container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+
+        /* Header Styles */
+        header { background-color: var(--dark); color: white; padding: 15px 0; position: sticky; top: 0; z-index: 1000; }
+        .header-container { display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-family: 'Orbitron', sans-serif; font-size: 28px; color: white; }
+        .logo span { color: var(--secondary); }
+        nav ul { display: flex; list-style: none; align-items: center; }
+        nav ul li { margin-left: 20px; }
+        nav ul li a { color: white; font-weight: 500; transition: color 0.3s; }
+        nav ul li a:hover, nav ul li a.active { color: var(--secondary); }
+        .signup-nav-btn { background-color: var(--primary); padding: 8px 16px; border-radius: 4px; color: white !important; }
+        .header-icons { display: flex; align-items: center; }
+        .header-icons button { color: white; background: none; border: none; margin-left: 20px; font-size: 20px; position: relative; cursor: pointer; }
+        .cart-count { position: absolute; top: -8px; right: -8px; background-color: var(--primary); color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 12px; display: flex; align-items: center; justify-content: center; }
+
+        /* Banner */
+        .page-banner { background: linear-gradient(135deg, var(--dark), #1f293d); color: white; padding: 50px 0; text-align: center; }
+        .page-banner h1 { font-family: 'Orbitron', sans-serif; font-size: 36px; margin-bottom: 10px; }
+        .page-banner p { color: #aaa; font-size: 16px; }
+
+        /* Brand Sections */
+        .brands-container { padding: 50px 0; flex: 1; }
+        .brand-section { margin-bottom: 50px; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .brand-header { display: flex; align-items: center; gap: 15px; margin-bottom: 25px; border-bottom: 2px solid #eee; padding-bottom: 15px; }
+        .brand-header i { font-size: 32px; color: var(--primary); }
+        .brand-header h2 { font-family: 'Orbitron', sans-serif; font-size: 24px; color: var(--dark); }
+
+        .brand-products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; }
+        .product-card { background: #fdfdfd; border: 1px solid #eee; border-radius: 8px; overflow: hidden; display: flex; flex-direction: column; transition: transform 0.3s; }
+        .product-card:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,0,0,0.08); }
+        .product-img-container { height: 160px; background-color: #f1f3f5; display: flex; align-items: center; justify-content: center; position: relative; }
+        .product-img-container i { font-size: 48px; color: var(--gray); }
+        .product-badge { position: absolute; top: 10px; left: 10px; background-color: var(--primary); color: white; padding: 3px 6px; font-size: 10px; font-weight: 600; border-radius: 4px; text-transform: uppercase; }
+        .product-info { padding: 15px; display: flex; flex-direction: column; flex: 1; }
+        .product-title { font-size: 15px; font-weight: 600; color: var(--dark); margin-bottom: 8px; line-height: 1.3; }
+        .product-price { font-size: 16px; font-weight: 700; color: var(--primary); margin-bottom: 12px; margin-top: auto; }
+        .add-to-cart-btn { width: 100%; padding: 8px; background-color: var(--dark); color: white; border: none; border-radius: 6px; font-weight: 500; cursor: pointer; transition: background-color 0.3s; }
+        .add-to-cart-btn:hover { background-color: var(--primary); }
+
+        /* Cart Modal */
+        .cart-modal { display: none; position: fixed; top: 0; right: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 2000; justify-content: flex-end; }
+        .cart-modal.active { display: flex; }
+        .cart-content { width: 100%; max-width: 450px; background-color: white; height: 100%; padding: 30px; overflow-y: auto; display: flex; flex-direction: column; }
+        .cart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #eee; }
+        .close-cart { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--gray); }
+        .cart-items { flex: 1; overflow-y: auto; }
+        .cart-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .cart-total { display: flex; justify-content: space-between; font-size: 20px; font-weight: 700; margin: 20px 0; padding-top: 15px; border-top: 2px solid #eee; }
+        .checkout-btn { width: 100%; padding: 14px; background-color: var(--success); color: white; border: none; border-radius: 6px; font-weight: 600; font-size: 16px; cursor: pointer; }
+
+        /* Toast notifications */
+        #toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; }
+        .toast { background: var(--dark); color: white; padding: 12px 24px; margin-top: 10px; border-radius: 4px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); border-left: 4px solid var(--secondary); animation: slideIn 0.3s ease, fadeOut 0.3s ease 2.7s forwards; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes fadeOut { to { opacity: 0; transform: translateY(10px); } }
+
+        /* Footer */
+        footer { background-color: var(--dark); color: white; padding: 40px 0; text-align: center; }
+        .copyright { color: #aaa; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container header-container">
+            <a href="index.html" class="logo"><i class="fas fa-laptop-code"></i> Zay's <span>Tech Hub</span></a>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="categories.html">Categories</a></li>
+                    <li><a href="products.html">Products</a></li>
+                    <li><a href="brands.html" class="active">Brands</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                    <li><a href="signup.html" class="signup-nav-btn">Sign Up</a></li>
+                </ul>
+            </nav>
+            <div class="header-icons">
+                <button id="cartBtn"><i class="fas fa-shopping-cart"></i><span class="cart-count" id="cartCount">0</span></button>
+            </div>
+        </div>
+    </header>
+
+    <div class="page-banner">
+        <div class="container">
+            <h1>Browse by Brand</h1>
+            <p>Explore trusted devices grouped by Apple, Samsung, HP, Dell, and ASUS.</p>
+        </div>
+    </div>
+
+    <div class="container brands-container">
+        <!-- Apple -->
+        <div class="brand-section">
+            <div class="brand-header"><i class="fab fa-apple"></i><h2>Apple iPhones</h2></div>
+            <div class="brand-products-grid" id="appleGrid"></div>
+        </div>
+
+        <!-- Samsung -->
+        <div class="brand-section">
+            <div class="brand-header"><i class="fas fa-mobile-screen"></i><h2>Samsung Phones</h2></div>
+            <div class="brand-products-grid" id="samsungGrid"></div>
+        </div>
+
+        <!-- HP -->
+        <div class="brand-section">
+            <div class="brand-header"><i class="fas fa-laptop"></i><h2>HP PCs & Laptops</h2></div>
+            <div class="brand-products-grid" id="hpGrid"></div>
+        </div>
+
+        <!-- Dell -->
+        <div class="brand-section">
+            <div class="brand-header"><i class="fas fa-desktop"></i><h2>Dell Laptops</h2></div>
+            <div class="brand-products-grid" id="dellGrid"></div>
+        </div>
+
+        <!-- ASUS -->
+        <div class="brand-section">
+            <div class="brand-header"><i class="fas fa-microchip"></i><h2>ASUS Devices</h2></div>
+            <div class="brand-products-grid" id="asusGrid"></div>
+        </div>
+    </div>
+
+    <!-- Cart Modal -->
+    <div class="cart-modal" id="cartModal">
+        <div class="cart-content">
+            <div class="cart-header">
+                <h2>Your Cart</h2>
+                <button class="close-cart" id="closeCartBtn"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="cart-items" id="cartItemsContainer"><p>Your cart is empty.</p></div>
+            <div class="cart-total"><span>Total:</span><span id="cartTotal">GH₵ 0.00</span></div>
+            <button class="checkout-btn" onclick="showToast('Proceeding to checkout secure gateway...')">Proceed to Checkout</button>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container"><div class="copyright"><p>&copy; 2026 Zay's Tech Hub. All rights reserved.</p></div></div>
+    </footer>
+
+    <script>
+        const allProducts = [
+            { id: 1, name: "Apple iPhone 11 (Refurbished/Clean)", category: "smartphone", brand: "apple", price: 3800, icon: "fa-mobile-screen", badge: "Best Seller" },
+            { id: 2, name: "Apple iPhone 12 (64GB)", category: "smartphone", brand: "apple", price: 5500, icon: "fa-mobile-screen", badge: "Popular" },
+            { id: 3, name: "Apple iPhone 13 (128GB)", category: "smartphone", brand: "apple", price: 7800, icon: "fa-mobile-screen", badge: "Top Tier" },
+            { id: 4, name: "Samsung Galaxy A15 (LTE/128GB)", category: "smartphone", brand: "samsung", price: 2100, icon: "fa-mobile-screen", badge: "Budget Value" },
+            { id: 5, name: "Samsung Galaxy A35 5G", category: "smartphone", brand: "samsung", price: 3600, icon: "fa-mobile-screen", badge: "New Arrival" },
+            { id: 6, name: "Samsung Galaxy S21 FE 5G", category: "smartphone", brand: "samsung", price: 4900, icon: "fa-mobile-screen", badge: "Flagship Deal" },
+            { id: 7, name: "HP ProBook 645 G4 (Ryzen 5 / 8GB)", category: "laptop", brand: "hp", price: 3200, icon: "fa-laptop", badge: "Office Choice" },
+            { id: 8, name: "HP EliteBook 840 G6 (Core i5 8th Gen)", category: "laptop", brand: "hp", price: 4200, icon: "fa-laptop", badge: "Reliable" },
+            { id: 9, name: "HP Pavilion x360 Convertible", category: "laptop", brand: "hp", price: 5400, icon: "fa-laptop", badge: "Touchscreen" },
+            { id: 10, name: "Dell Latitude 5490 (Core i5 / 256GB)", category: "laptop", brand: "dell", price: 3400, icon: "fa-laptop", badge: "Student Pick" },
+            { id: 11, name: "Dell Latitude 7400 (Core i7 / 16GB)", category: "laptop", brand: "dell", price: 4800, icon: "fa-laptop", badge: "High Performance" },
+            { id: 12, name: "ASUS VivoBook 15 (Core i3 / 8GB)", category: "laptop", brand: "asus", price: 3900, icon: "fa-laptop", badge: "Sleek Design" },
+            { id: 13, name: "ASUS TUF Gaming A15 (GTX 1650)", category: "laptop", brand: "asus", price: 7900, icon: "fa-laptop", badge: "Gaming" }
+        ];
+
+        let cart = JSON.parse(localStorage.getItem('zays_cart')) || [];
+
+        function renderBrandGrids() {
+            const brands = ['apple', 'samsung', 'hp', 'dell', 'asus'];
+            brands.forEach(b => {
+                const container = document.getElementById(`${b}Grid`);
+                const brandItems = allProducts.filter(p => p.brand === b);
+                container.innerHTML = brandItems.map(p => `
+                    <div class="product-card">
+                        <div class="product-img-container">
+                            <span class="product-badge">${p.badge}</span>
+                            <i class="fas ${p.icon}"></i>
+                        </div>
+                        <div class="product-info">
+                            <h3 class="product-title">${p.name}</h3>
+                            <div class="product-price">GH₵ ${p.price.toLocaleString()}</div>
+                            <button class="add-to-cart-btn" onclick="addToCart(${p.id})">Add to Cart</button>
+                        </div>
+                    </div>
+                `).join('');
+            });
+        }
+
+        function addToCart(productId) {
+            const product = allProducts.find(p => p.id === productId);
+            const existingItem = cart.find(item => item.id === productId);
+
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({ ...product, quantity: 1 });
+            }
+
+            localStorage.setItem('zays_cart', JSON.stringify(cart));
+            updateCartUI();
+            showToast(`${product.name} added to cart!`);
+        }
+
+        function updateCartUI() {
+            const countEl = document.getElementById('cartCount');
+            const totalCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+            countEl.textContent = totalCount;
+
+            const container = document.getElementById('cartItemsContainer');
+            if (cart.length === 0) {
+                container.innerHTML = '<p>Your cart is empty.</p>';
+                document.getElementById('cartTotal').textContent = 'GH₵ 0.00';
+                return;
+            }
+
+            let total = 0;
+            container.innerHTML = cart.map(item => {
+                total += item.price * item.quantity;
+                return `
+                    <div class="cart-item">
+                        <div>
+                            <strong>${item.name}</strong><br>
+                            <small>GH₵ ${item.price.toLocaleString()} × ${item.quantity}</small>
+                        </div>
+                        <div style="color:var(--primary); font-weight:bold;">GH₵ ${(item.price * item.quantity).toLocaleString()}</div>
+                    </div>
+                `;
+            }).join('');
+            document.getElementById('cartTotal').textContent = `GH₵ ${total.toLocaleString()}`;
+        }
+
+        function showToast(message) {
+            let container = document.getElementById('toast-container');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'toast-container';
+                document.body.appendChild(container);
+            }
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        document.getElementById('cartBtn').addEventListener('click', () => document.getElementById('cartModal').classList.add('active'));
+        document.getElementById('closeCartBtn').addEventListener('click', () => document.getElementById('cartModal').classList.remove('active'));
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderBrandGrids();
+            updateCartUI();
+        });
+    </script>
+</body>
+</html>
